@@ -1,11 +1,8 @@
 const { embed, chat } = require('./qwenClient');
 const { v4: uuidv4 } = require('uuid');
-
-// In-memory store for now (we'll swap to OpenSearch next)
-const memoryStore = [];
+const store = require('./store');
 
 async function ingestSession({ patientId, trialId, sessionDate, notes, authorId }) {
-  // Chunk the notes into meaningful segments
   const chunks = chunkText(notes);
   const stored = [];
 
@@ -22,30 +19,35 @@ async function ingestSession({ patientId, trialId, sessionDate, notes, authorId 
       embedding: vector,
       createdAt: new Date().toISOString()
     };
-    memoryStore.push(memory);
+    store.append(memory);
     stored.push(memory.id);
   }
 
-  return { chunksStored: stored.length, chunkIds: stored };
+  const priorMemory = store.filter(m =>
+    m.patientId === patientId && m.trialId === trialId && m.sessionDate !== sessionDate
+  );
+
+  let anomalyResult = { hasAnomaly: false, alerts: [] };
+  if (priorMemory.length > 0) {
+    const { checkForAnomalies } = require('./anomalyDetector');
+    anomalyResult = await checkForAnomalies({ patientId, trialId, newSessionNotes: notes, sessionDate });
+  }
+
+  return { chunksStored: stored.length, chunkIds: stored, anomalyCheck: anomalyResult };
 }
 
 async function recall({ query, patientId, trialId, topK = 5 }) {
-  if (memoryStore.length === 0) return { answer: 'No memory found for this patient yet.', sources: [] };
-
-  // Filter by patient + trial
-  const filtered = memoryStore.filter(m =>
+  const filtered = store.filter(m =>
     m.patientId === patientId && m.trialId === trialId
   );
   if (filtered.length === 0) return { answer: 'No sessions recorded for this patient.', sources: [] };
 
-  // Embed the query and rank by cosine similarity
   const queryVec = await embed(query);
   const ranked = filtered
     .map(m => ({ ...m, score: cosineSim(queryVec, m.embedding) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, topK);
 
-  // Build context for Qwen
   const context = ranked.map((m, i) =>
     `[Memory ${i+1} — ${m.sessionDate} — ${m.chunkType}]\n${m.content}`
   ).join('\n\n');
@@ -63,12 +65,8 @@ async function recall({ query, patientId, trialId, topK = 5 }) {
 }
 
 function chunkText(text) {
-  // Split on double newlines or sentence boundaries, tag by keyword
   const raw = text.split(/\n\n+/).filter(s => s.trim().length > 20);
-  return raw.map(t => ({
-    text: t.trim(),
-    type: detectType(t)
-  }));
+  return raw.map(t => ({ text: t.trim(), type: detectType(t) }));
 }
 
 function detectType(text) {
