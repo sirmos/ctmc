@@ -169,3 +169,14 @@ html, body, #root { height: 100%; }
 .report-meta-title { font-size: 14px; font-weight: 600; color: #0f172a; }
 .report-meta-sub { font-size: 12px; color: var(--card-sub); margin-top: 2px; }
 .report-body { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; color: #1e293b; white-space: pre-wrap; word-break: break-word; background: #f8fafc; border: 1px solid var(--card-border); border-radius: 8px; padding: 20px; }
+
+/* ── Audit ── */
+.audit-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.audit-table th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; background: #f8fafc; border-bottom: 1px solid var(--card-border); }
+.audit-table td { padding: 11px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.audit-table tr:last-child td { border-bottom: none; }
+.audit-table tr:hover td { background: #f8fafc; }
+.audit-ts { font-size: 12px; color: #64748b; white-space: nowrap; }
+.audit-mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0f172a; }
+.audit-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.05em; }
+.audit-details { font-size: 12px; color: #64748b; max-width: 280px; }

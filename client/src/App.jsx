@@ -3,6 +3,7 @@ import Chat from './pages/Chat';
 import Ingest from './pages/Ingest';
 import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
+import Audit from './pages/Audit';
 import './App.css';
 
 export default function App() {
@@ -33,6 +34,9 @@ export default function App() {
             <NavLink to="/reports" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
               <span className="nav-icon">📄</span> Reports
             </NavLink>
+            <NavLink to="/audit" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+              <span className="nav-icon">🔍</span> Audit Trail
+            </NavLink>
           </nav>
           <div className="sidebar-footer">
             <div className="trial-pill">
@@ -52,6 +56,7 @@ export default function App() {
                 <Route path="/ingest" element={<span className="topbar-page">Log Session</span>} />
                 <Route path="/alerts" element={<span className="topbar-page">Alerts</span>} />
                 <Route path="/reports" element={<span className="topbar-page">Report Generator</span>} />
+                <Route path="/audit" element={<span className="topbar-page">Audit Trail</span>} />
               </Routes>
             </div>
             <div className="topbar-right">
@@ -70,6 +75,7 @@ export default function App() {
               <Route path="/ingest" element={<Ingest />} />
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/audit" element={<Audit />} />
             </Routes>
           </main>
         </div>
