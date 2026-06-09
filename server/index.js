@@ -7,6 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/memory', require('./routes/memory'));
+app.use('/api/reports', require('./routes/reports'));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'CTMC API' }));
 
